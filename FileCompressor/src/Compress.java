@@ -13,7 +13,6 @@ public class Compress {
 	HashMap<Character, String > codes = new HashMap<Character, String>();
 	TreeNode root;
 	boolean lastByte = false;
-	boolean addedEOF = false;
 	int lastByteIndex = 0;
 	
 	public Compress(HashMap<Character, String > codes, TreeNode root ) {
@@ -21,22 +20,22 @@ public class Compress {
 		this.root = root;
 	}
 	
-	public String preOrderTarversal(  TreeNode root, StringBuilder str )
+	public String preOrderTarversal(  TreeNode root, String str )
 	{
 		if( root == null )
 			return str.toString();
 		if( !root.isLeafNode() )
 		{
-			str.append(0);
-			String tmp;
-			tmp = preOrderTarversal( root.left, str);
-			tmp = preOrderTarversal( root.right, new StringBuilder(tmp));
-			return tmp;
+			str = str + '0';
+			str = preOrderTarversal( root.left, str);
+			str = preOrderTarversal( root.right, str);
+			System.out.println( str );
+			return str;
 		} else
 		{
-			str.append(1);
-			str.append(root.c);
-			return str.toString();
+			str = str + '1';
+			str = str + root.c;
+			return str;
 		}
 	}
 	
@@ -50,7 +49,7 @@ public class Compress {
         	if( header.charAt(i) == '1')
         	{
         		//set the bit with index currentIndex to 1 in currentB
-        		currentB = currentB | (1<< currentIndex);
+        		currentB = currentB | (128 >> currentIndex);
         		currentIndex++;
         	}else if( header.charAt(i) == '0')
         	{
@@ -63,13 +62,13 @@ public class Compress {
         		int tempChar = header.charAt(i);
         		if( currentIndex != 0)
         		{
-        			tempChar = tempChar << currentIndex; //example: if current index was 3, that means that buffer has 3 bits already used
+        			tempChar = tempChar >> currentIndex; //example: if current index was 3, that means that buffer has 3 bits already used
             		currentB = currentB | tempChar; //therefore shift character by 3 bits to the left, five bits will be added to buffer
             		compressedBytes.add(currentB);  //or the buffer& shifter character
             		currentB = 0; //add old buffer to arrayList and empty buffer
             		
             		tempChar = header.charAt(i);  //to get the rest of the bits
-            		tempChar = tempChar >> (8-currentIndex); //example: shift the five bits that we already added, out of the character (8-3) = 5
+            		tempChar = tempChar << (8-currentIndex); //example: shift the five bits that we already added, out of the character (8-3) = 5
             		currentB = currentB | tempChar;  // or the buffer and character, current Index should  still be 3 but for the new buffer
         		}else
         		{//the buffer is empty and can take the whole character
@@ -95,8 +94,9 @@ public class Compress {
         	lastByteIndex = currentIndex;
         }
 	}
+      
 	
-	public void createCompressedFile(String filePath) {
+public void createCompressedFile(String filePath) {
 		
 		FileInputStream in = null;
        
@@ -104,7 +104,7 @@ public class Compress {
         try {
             in = new FileInputStream(filePath);
             int tempChar, currentIndex = 0, currentB = 0;
-            while ((tempChar = in.read()) != -1 || !addedEOF ) { //not sure of this condition though, what happens when in.read is called twice when 
+            while ((tempChar = in.read()) != -1 ) { //not sure of this condition though, what happens when in.read is called twice when 
             	//file is already completely read 
                 
             	if( lastByte ) //check only the first time entering the loop
@@ -115,13 +115,8 @@ public class Compress {
             	}
             	
             	String characCode;
+                characCode = codes.get( (char)tempChar);
             	
-            	if( tempChar != -1)
-            		 characCode = codes.get( (char)tempChar);
-            	else {
-            		characCode = codes.get( '-'); //whatever end of file charac would be
-            		addedEOF = true;
-            	}
             	
             	int len = characCode.length(); //loop on the character's code
             	
@@ -130,7 +125,7 @@ public class Compress {
             		if( characCode.charAt(i) == '1')
                 	{
                 		//set the bit with index currentIndex to 1 in currentB
-                		currentB = currentB | (1<< currentIndex);
+                		currentB = currentB | (128>> currentIndex);
                 		currentIndex++;
                 	}else if( characCode.charAt(i) == '0')
                 	{
@@ -144,6 +139,15 @@ public class Compress {
                 		currentB = 0;
                 		currentIndex = 0;
             		}
+            	}
+            	
+            	if( currentIndex != 0 )
+            	{
+            		compressedBytes.add(currentB);
+            		compressedBytes.add(currentIndex); //number of valid bits in last byte
+            	}else
+            	{
+            		compressedBytes.add(8); //number of valid bits is the whole byte
             	}
             	
            }

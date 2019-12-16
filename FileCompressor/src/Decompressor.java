@@ -1,26 +1,30 @@
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Decompressor {
 
 	TreeNode root =null;
 	static BitReader reader = null;
-	BufferedWriter out = null;
 	
-	public Decompressor(String pathName) throws IOException
+	
+	public Decompressor() throws IOException
 	{
-		reader = new BitReader(pathName);
-		String substring = (String) pathName.subSequence(0, pathName.lastIndexOf("compressed.txt"));
-	    out = new BufferedWriter(new FileWriter(substring + "decompressed.txt"));
+		reader = new BitReader("compressedFile.txt");
 	
 	}
+	
 	
 	public  TreeNode reconstructHuffmanTree() throws IOException {
 		 if (reader.readBit() == 1)
 		    {
 			 	TreeNode t = new TreeNode();
-			 	t.c=(char)reader.readByte();
+			 	t.c=(char) ( reader.readByte() & 0xFF);
+			 	System.out.println("TREE CHARACRER " + t.c);
 			 	t.right=null;
 			 	t.left=null;
 			 	return t;
@@ -31,11 +35,54 @@ public class Decompressor {
 		        TreeNode rightChild = reconstructHuffmanTree();
 		    	TreeNode t = new TreeNode();
 			 	t.c='-';
-			 	t.right=null;
-			 	t.left=null;
+			 	t.right= rightChild;
+			 	t.left= leftChild;
 			 	return t;
 		    }
 	}
 
+	public void decompressFile(HashMap<String, Character> codes) {
+		 FileOutputStream out = null;
+
+
+for (Map.Entry< String, Character> entry : codes.entrySet())  
+            System.out.println("Key = " + entry.getKey() + 
+                             ", Value = " + entry.getValue()); 
+	        try {
+	        	
+	        	File outputFile = new File("DecompressedFile.txt");
+	        	outputFile.createNewFile(); // if file already exists will do nothing 
+	            out = new FileOutputStream( outputFile, false);
+	            
+	            StringBuilder temp = new StringBuilder("");
+	            while(true)
+	            {
+	            	int currentBit =  reader.readBit();
+	            	if( currentBit == -1)
+	            		break;
+	            	else if( currentBit == 0)
+	            		temp.append('0');
+	            	else
+	            		temp.append('1');
+	            	if( codes.containsKey(temp.toString()))
+            		{
+	            		System.out.print(codes.get(temp.toString()));
+            			out.write( codes.get(temp.toString()));
+            			temp = new StringBuilder("");
+            		}
+	            		
+	            }
+	            	//out.write(character);
+	           
+	            
+	            if (out != null) {
+	            	out.flush();
+	                out.close();
+	            }
+	        } catch(IOException e) {
+	        	e.printStackTrace();
+	        	System.out.println("HELLO THERE");
+	        }
+	}
 	
 }

@@ -31,6 +31,7 @@ public class huffmanTree {
 	private int[] arr;
 	private PriorityQueue<TreeNode> heap;
 	private HashMap<Character,String> encodingMap;
+	private HashMap<String, Character> flippedEncodingMap;
 	private TreeNode root;
 	
 	public huffmanTree(int[] arr)
@@ -38,10 +39,25 @@ public class huffmanTree {
 		this.arr=arr;
 		heap   = new PriorityQueue<TreeNode>(arr.length, new MyComparator()); 
 		encodingMap = new HashMap<>();
+		flippedEncodingMap = new HashMap<>();
 		root=null;
 		
 	}
 	
+	
+	
+	public HashMap<String, Character> getFlippedEncodingMap() {
+		return flippedEncodingMap;
+	}
+
+
+
+	public void setFlippedEncodingMap(HashMap<String, Character> flippedEncodingMap) {
+		this.flippedEncodingMap = flippedEncodingMap;
+	}
+
+
+
 	private void addLeafNodes()
 	{
 		int n = arr.length;
@@ -89,16 +105,28 @@ public class huffmanTree {
           return this.encodingMap;
 	}
 	
-	 private void buildEncodingMap(TreeNode root, String s) 
+	 public void buildEncodingMap(TreeNode root, String s) 
 	    { 
 	        if (root.left== null && root.right == null) { 
 	        	encodingMap.put(root.c, s);
+	        	System.out.print("This character was in the tree" + root.c + "with code "+ s);
 	            return; 
 	        } 
  
 	        buildEncodingMap(root.left,s+"0");
 	        buildEncodingMap(root.right,s+"1"); 
 	    } 
+	 
+	 public void FlipEncodingMap(TreeNode root, String s) 
+	    { 
+	        if (root.left== null && root.right == null) { 
+	        	flippedEncodingMap.put(s, root.c);
+	            return; 
+	        } 
+
+	        FlipEncodingMap(root.left,s+"0");
+	        FlipEncodingMap(root.right,s+"1"); 
+	    }
 	  
 	 public TreeNode getRoot() {
 			return root;
@@ -118,6 +146,8 @@ public class huffmanTree {
 		map = h.buildTree();
 		System.out.println(Arrays.asList(map)); 
 	}
+
+	
 
 	
 }

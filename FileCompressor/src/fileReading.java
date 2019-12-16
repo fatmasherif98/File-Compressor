@@ -13,7 +13,7 @@ public static int[] readFromFileReturnArray() throws IOException {
 	int chars[] = new int[265]; 
     
 	JFileChooser chooser = new JFileChooser();
-    FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
+    FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif", "txt");
     chooser.setFileFilter(filter);
     int returnVal = chooser.showOpenDialog(null);
     
@@ -37,13 +37,14 @@ public static int[] readFromFileReturnArray() throws IOException {
           		          
     }
     
-    chars[45] = 1; //EOF
+    
 	return chars;
 }
 		public static void main(String[] args) throws IOException {
 			
 			int chars[]=readFromFileReturnArray();  
 			huffmanTree huffmanT = new huffmanTree( chars );
+			Decompressor decompressor = new Decompressor();
 			HashMap<Character, String > codes;
 			TreeNode root;
 			
@@ -58,13 +59,20 @@ public static int[] readFromFileReturnArray() throws IOException {
 		   
 		   Compress compress = new Compress(codes, root);
 		   
-		   String header = compress.preOrderTarversal(root, new StringBuilder(""));
+		   String header = compress.preOrderTarversal(root, "");
 		   
+		   System.out.println( "This is the header>"+header+"<" );
 		   compress.createHeaderBytes(header);
 		   
 		   compress.createCompressedFile(filePath);
 		   
 		   compress.writeToFile();
+		   
+		  decompressor.root =  decompressor.reconstructHuffmanTree();
+		   
+		   huffmanT.FlipEncodingMap(decompressor.root, "");
+		   
+		   decompressor.decompressFile(huffmanT.getFlippedEncodingMap());
 			
 		}
 }
