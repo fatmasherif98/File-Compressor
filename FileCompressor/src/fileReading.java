@@ -42,9 +42,10 @@ public static int[] readFromFileReturnArray() throws IOException {
 }
 		public static void main(String[] args) throws IOException {
 			
+			
 			int chars[]=readFromFileReturnArray();  
 			huffmanTree huffmanT = new huffmanTree( chars );
-			Decompressor decompressor = new Decompressor();
+		Decompressor decompressor = new Decompressor();
 			HashMap<Character, String > codes;
 			TreeNode root;
 			

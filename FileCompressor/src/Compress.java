@@ -46,15 +46,18 @@ public class Compress {
         
         for(int i=0; i<len; i++) //loops on every character in header
         {
+        	System.out.println("CURRENT INDEX IS " + currentIndex );
         	if( header.charAt(i) == '1')
         	{
         		//set the bit with index currentIndex to 1 in currentB
-        		currentB = currentB | (128 >> currentIndex);
+        		currentB = (currentB | (128 >> currentIndex) );
+        		System.out.println("I is "+ i +" char is " + header.charAt(i) + " and we are in 1" + Integer.toBinaryString(currentB));
         		currentIndex++;
         	}else if( header.charAt(i) == '0')
         	{
         		//do nothing just increment the index
         		currentIndex++;
+        		System.out.println("I is "+ i +" char is " + header.charAt(i) + " and we are in 0" + Integer.toBinaryString(currentB));
         	}
         	else 
         	{
@@ -65,6 +68,7 @@ public class Compress {
         			tempChar = tempChar >> currentIndex; //example: if current index was 3, that means that buffer has 3 bits already used
             		currentB = currentB | tempChar; //therefore shift character by 3 bits to the left, five bits will be added to buffer
             		compressedBytes.add(currentB);  //or the buffer& shifter character
+            		System.out.println("H" + Integer.toBinaryString(currentB));
             		currentB = 0; //add old buffer to arrayList and empty buffer
             		
             		tempChar = header.charAt(i);  //to get the rest of the bits
@@ -74,6 +78,7 @@ public class Compress {
         		{//the buffer is empty and can take the whole character
         			currentB = currentB | tempChar;
             		compressedBytes.add(currentB);
+            		System.out.println("H" + Integer.toBinaryString(currentB));
             		currentB = 0; //currentIndex is still zero
         		}
         	
@@ -82,6 +87,7 @@ public class Compress {
         	if( currentIndex == 8) //if our buffer is full, add it to the array
         	{
         		compressedBytes.add(currentB);
+        		System.out.println("H" + Integer.toBinaryString(currentB));
         		currentB = 0;
         		currentIndex = 0;
         	}
@@ -90,6 +96,8 @@ public class Compress {
         
         if( currentIndex != 0)
         {
+        	compressedBytes.add(currentB);
+        	System.out.println("H" + Integer.toBinaryString(currentB));
         	lastByte = true;
         	lastByteIndex = currentIndex;
         }
@@ -116,6 +124,7 @@ public void createCompressedFile(String filePath) {
             	
             	String characCode;
                 characCode = codes.get( (char)tempChar);
+                System.out.println("Character code is "+ characCode);
             	
             	
             	int len = characCode.length(); //loop on the character's code
@@ -141,17 +150,18 @@ public void createCompressedFile(String filePath) {
             		}
             	}
             	
-            	if( currentIndex != 0 )
-            	{
-            		compressedBytes.add(currentB);
-            		compressedBytes.add(currentIndex); //number of valid bits in last byte
-            	}else
-            	{
-            		compressedBytes.add(8); //number of valid bits is the whole byte
-            	}
-            	
+            
            }
             
+        	if( currentIndex != 0 )
+        	{
+        		compressedBytes.add(currentB);
+        		compressedBytes.add(currentIndex); //number of valid bits in last byte
+        	}else
+        	{
+        		compressedBytes.add(8); //number of valid bits is the whole byte
+        	}
+        	
             in.close();
         } catch (IOException e) {
 			
@@ -169,11 +179,12 @@ public void createCompressedFile(String filePath) {
         	File outputFile = new File("compressedFile.txt");
         	outputFile.createNewFile(); // if file already exists will do nothing 
             out = new FileOutputStream( outputFile, false);
-            
+            System.out.println("STARTING FILE PRINT");
             
             for( int character : compressedBytes)
             {
-            	out.write(character);
+                out.write(character);
+            	System.out.println( Integer.toBinaryString(character) + "is "+ character);
             }
             
             if (out != null) {

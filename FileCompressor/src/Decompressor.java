@@ -23,8 +23,8 @@ public class Decompressor {
 		 if (reader.readBit() == 1)
 		    {
 			 	TreeNode t = new TreeNode();
-			 	t.c=(char) ( reader.readByte() & 0xFF);
-			 	System.out.println("TREE CHARACRER " + t.c);
+			 	t.c= (char) ((char) reader.readByte() & 0xFF);
+			 	System.out.println("TREE CHARACRER " + t.c + " " + Integer.toBinaryString(t.c));
 			 	t.right=null;
 			 	t.left=null;
 			 	return t;
