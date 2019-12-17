@@ -117,9 +117,12 @@ public void createCompressedFile(String filePath) {
                 
             	if( lastByte ) //check only the first time entering the loop
             	{
+            		
             		currentIndex = this.lastByteIndex;
             		currentB = compressedBytes.get(compressedBytes.size()-1);
+            		compressedBytes.remove(compressedBytes.size()-1);
             		lastByte = false;
+            		System.out.println(" INSIDE LAST BYTE "+ Integer.toBinaryString(currentB));
             	}
             	
             	String characCode;
@@ -145,6 +148,7 @@ public void createCompressedFile(String filePath) {
             		if( currentIndex == 8 )
             		{
             			compressedBytes.add(currentB);
+            			System.out.println("NEW ALERT " + Integer.toBinaryString(currentB));
                 		currentB = 0;
                 		currentIndex = 0;
             		}
@@ -155,6 +159,7 @@ public void createCompressedFile(String filePath) {
             
         	if( currentIndex != 0 )
         	{
+        		System.out.println("NEW ALERT " + Integer.toBinaryString(currentB));
         		compressedBytes.add(currentB);
         		compressedBytes.add(currentIndex); //number of valid bits in last byte
         	}else
@@ -184,7 +189,7 @@ public void createCompressedFile(String filePath) {
             for( int character : compressedBytes)
             {
                 out.write(character);
-            	System.out.println( Integer.toBinaryString(character) + "is "+ character);
+            	System.out.println( Integer.toBinaryString(character) + " BINARY BYTE "+ (char )character);
             }
             
             if (out != null) {

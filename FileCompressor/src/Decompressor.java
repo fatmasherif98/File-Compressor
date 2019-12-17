@@ -18,12 +18,26 @@ public class Decompressor {
 	
 	}
 	
+	public char createAsciiCharacter() throws IOException
+	{
+		int currentB = 0;
+		for(int i=0; i<8; i++)
+		{
+			if( reader.readBit() == 1)
+			{
+				currentB = currentB | (128 >> i);
+			}
+		}
+		
+		return (char)currentB;
+	}
 	
 	public  TreeNode reconstructHuffmanTree() throws IOException {
 		 if (reader.readBit() == 1)
 		    {
 			 	TreeNode t = new TreeNode();
-			 	t.c= (char) ((char) reader.readByte() & 0xFF);
+			 	t.c= createAsciiCharacter();
+			 			//(char) ((char) reader.readByte() & 0xFF);
 			 	System.out.println("TREE CHARACRER " + t.c + " " + Integer.toBinaryString(t.c));
 			 	t.right=null;
 			 	t.left=null;
